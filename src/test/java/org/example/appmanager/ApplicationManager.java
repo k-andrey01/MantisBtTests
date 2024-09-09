@@ -7,6 +7,7 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.Browser;
 
+import javax.management.monitor.MonitorMBean;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class ApplicationManager {
     private final Properties properties;
     protected WebDriver driver;
     private String browser;
+    private RegistrationHelper registrationHelper;
 
     public ApplicationManager(String browser) {
         this.browser = browser;
@@ -27,23 +29,12 @@ public class ApplicationManager {
     public void init() throws IOException {
         String target = System.getProperty("target", "local");
         properties.load(new FileReader(new File(String.format("src/test/resources/%s.properties", target))));
-
-        if (browser.equals(Browser.EDGE.browserName())) {
-            driver = new EdgeDriver();
-        } else if (browser.equals(Browser.CHROME.browserName())) {
-            driver = new ChromeDriver();
-        } else if (browser.equals(Browser.IE.browserName())) {
-            driver = new InternetExplorerDriver();
-        }
-
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-
-        driver.get(properties.getProperty("web.baseUrl"));
-        driver.manage().window().setSize(new Dimension(1604, 865));
     }
 
     public void stop() {
-        driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
     public HttpSession newSession(){
@@ -52,5 +43,30 @@ public class ApplicationManager {
 
     public String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    public RegistrationHelper getRegistrationHelper() {
+        if (registrationHelper == null){
+            registrationHelper = new RegistrationHelper(this);
+        }
+        return registrationHelper;
+    }
+
+    public WebDriver getDriver() {
+        if (driver == null) {
+            if (browser.equals(Browser.EDGE.browserName())) {
+                driver = new EdgeDriver();
+            } else if (browser.equals(Browser.CHROME.browserName())) {
+                driver = new ChromeDriver();
+            } else if (browser.equals(Browser.IE.browserName())) {
+                driver = new InternetExplorerDriver();
+            }
+
+            driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+
+            driver.get(properties.getProperty("web.baseUrl"));
+            driver.manage().window().setSize(new Dimension(1604, 865));
+        }
+        return driver;
     }
 }
