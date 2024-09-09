@@ -7,7 +7,6 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.Browser;
 
-import javax.management.monitor.MonitorMBean;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,6 +19,7 @@ public class ApplicationManager {
     protected WebDriver driver;
     private String browser;
     private RegistrationHelper registrationHelper;
+    private FtpHelper ftpHelper;
 
     public ApplicationManager(String browser) {
         this.browser = browser;
@@ -50,6 +50,13 @@ public class ApplicationManager {
             registrationHelper = new RegistrationHelper(this);
         }
         return registrationHelper;
+    }
+
+    public FtpHelper getFtpHelper() {
+        if (ftpHelper == null){
+            ftpHelper = new FtpHelper(this);
+        }
+        return ftpHelper;
     }
 
     public WebDriver getDriver() {
